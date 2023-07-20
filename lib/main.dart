@@ -70,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = GeneratorPage();
         break;
       case 1:
-        page = Placeholder();
+        page = FavouritePage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -80,21 +80,22 @@ class _MyHomePageState extends State<MyHomePage> {
       return Scaffold(
         body: Row(children: [
           SafeArea(
-              child: NavigationRail(
-            extended: constraints.maxWidth > 600,
-            destinations: [
-              NavigationRailDestination(
-                  icon: Icon(Icons.home), label: Text("Home")),
-              NavigationRailDestination(
-                  icon: Icon(Icons.favorite), label: Text('Favourites'))
-            ],
-            selectedIndex: selectedIndex,
-            onDestinationSelected: (value) {
-              setState(() {
-                selectedIndex = value;
-              });
-            },
-          )),
+            child: NavigationRail(
+              extended: constraints.maxWidth > 600,
+              destinations: [
+                NavigationRailDestination(
+                    icon: Icon(Icons.home), label: Text("Home")),
+                NavigationRailDestination(
+                    icon: Icon(Icons.favorite), label: Text('Favourites'))
+              ],
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                setState(() {
+                  selectedIndex = value;
+                });
+              },
+            ),
+          ),
           Expanded(
             child: Container(
               color: Theme.of(context).colorScheme.primaryContainer,
@@ -104,6 +105,44 @@ class _MyHomePageState extends State<MyHomePage> {
         ]),
       );
     });
+  }
+}
+
+class FavouritePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var words = appState.favouritedWords;
+
+    if (words.isEmpty) {
+      return Center(child: Text("No favourites yet."));
+    }
+
+    var theme = Theme.of(context);
+
+    return ListView(
+      children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: Card(
+            color: theme.colorScheme.primary,
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Text(
+                "Here are your favourited words!",
+                style: theme.textTheme.displayMedium!
+                    .copyWith(color: theme.colorScheme.onPrimary),
+              ),
+            ),
+          ),
+        ),
+        for (var pair in words)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(pair.asLowerCase),
+          )
+      ],
+    );
   }
 }
 
